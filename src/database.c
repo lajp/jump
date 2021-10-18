@@ -250,7 +250,7 @@ find_record_by_alias(const char *keyword, sqlite3 *controller, char *dest)
             return 0;
         case SQLITE_ROW:
             result = (const char *) sqlite3_column_text(statement, 0);
-            strlcpy(dest, result, PATH_MAX_LENGTH - 1);
+            strcpy(dest, result);
             sqlite3_finalize(statement);
             break;
         default:
@@ -329,7 +329,7 @@ get_db_path(char *dest_dir, char *dest_full)
     standard_exists = env_get != NULL && strlen(env_get) > 0;
 
     if (standard_exists == 1) {
-        strlcpy(xdg_config_home, env_get, PATH_MAX_LENGTH - 1);
+        strcpy(xdg_config_home, env_get);
 
         struct stat xdg_standard_exists = {0};
         if (stat(xdg_config_home, &xdg_standard_exists) == -1) {
@@ -346,28 +346,28 @@ get_db_path(char *dest_dir, char *dest_full)
         }
 
         if (strncmp(&xdg_config_home[strlen(xdg_config_home)-1], "/", PATH_MAX_LENGTH - 1)) {
-            strlcat(xdg_config_home, "/", PATH_MAX_LENGTH - 1);
+            strcat(xdg_config_home, "/");
         }
-        strlcat(xdg_config_home, "jump/", PATH_MAX_LENGTH - 1);
-        strlcpy(config_home, xdg_config_home, PATH_MAX_LENGTH - 1);
+        strcat(xdg_config_home, "jump/");
+        strcpy(config_home, xdg_config_home);
     }
 
     else {
         wordexp_t p;
         wordexp( DB_DIR , &p, 0 );
-        strlcpy(config_home, *p.we_wordv, PATH_MAX_LENGTH-1);
+        strcpy(config_home, *p.we_wordv);
         wordfree(&p);
     }
 
     if (strncmp(&config_home[strlen(config_home)-1], "/", 1) != 0) {
-        strlcat(config_home, "/", PATH_MAX_LENGTH);
+        strcat(config_home, "/");
     }
 
-    strlcpy(config_full, config_home, sizeof(config_full) - 1);
-    strlcat(config_full, DB_FILENAME, sizeof(config_full) - 1);
+    strcpy(config_full, config_home);
+    strcat(config_full, DB_FILENAME);
 
-    strlcpy(dest_dir,  config_home, PATH_MAX_LENGTH - 1);
-    strlcpy(dest_full, config_full, PATH_MAX_LENGTH - 1);
+    strcpy(dest_dir,  config_home);
+    strcpy(dest_full, config_full);
 
     return 0;
 }

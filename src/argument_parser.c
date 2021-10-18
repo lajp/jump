@@ -40,7 +40,9 @@ parse_and_populate_args(int argc, char **argv, struct arguments *args)
         }
 
         int alias_to_memory;
-        alias_to_memory = strlcpy(args->alias, argv[2], sizeof(args->alias));
+        strcpy(args->alias, argv[2]);
+		alias_to_memory = strlen(args->alias);
+
 
         if (alias_to_memory > PATH_MAX_LENGTH) {
             print_critical("Predicted buffer overflow, maybe try shorter alias?");
@@ -56,7 +58,8 @@ parse_and_populate_args(int argc, char **argv, struct arguments *args)
                 if (argv[1][0] == '-')
                     return 0;
 
-                if (strlcpy(args->alias, argv[1], sizeof(args->alias)) > PATH_MAX_LENGTH) {
+                if (strcpy(args->alias, argv[1]) < 0) {
+                    // TODO: wrong error
                     print_critical(pred_buf_overflow_msg);
                     return -1;
                 }
@@ -67,11 +70,13 @@ parse_and_populate_args(int argc, char **argv, struct arguments *args)
                     return -1;
                 }
 
-                if (strlcpy(args->alias, argv[1], sizeof(args->alias)) > PATH_MAX_LENGTH) {
+                if (strcpy(args->alias, argv[1]) < 0) {
+                    // TODO: wrong error
                     print_critical(pred_buf_overflow_msg);
                     return -1;
                 }
-                if (strlcpy(args->path, argv[2], sizeof(args->path)) > PATH_MAX_LENGTH) {
+                if (strcpy(args->path, argv[2]) < 0) {
+                    // TODO: wrong error
                     print_critical(pred_buf_overflow_msg);
                     return -1;
                 }
@@ -140,8 +145,8 @@ int
 populate_struct_defaults(struct arguments *options)
 {
     // \0 == NULL
-    strlcpy(options->alias, "\0", sizeof(options->alias));
-    strlcpy(options->path,  "\0", sizeof(options->path));
+    strcpy(options->alias, "\0");
+    strcpy(options->path,  "\0");
     options->help = 0;
     options->arg_delete_alias = 0;
     options->reset_database = 0;
